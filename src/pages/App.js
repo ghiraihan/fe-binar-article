@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer, toast } from "react-toastify";
-import { Button, Container, Table } from "reactstrap";
+import { Button, Container, Spinner, Table } from "reactstrap";
 
 async function hitApi() {
-  const response = await fetch('http://localhost:3555/api/article');
+  const response = await fetch(process.env.REACT_APP_BE_URL + '/api/article');
   const data = await response.json();
   return data;
 }
 
 function App() {
   const [article, setArticle] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  function navigateTo(path) {
+    navigate(path)
+  }
 
   useEffect(function() {
+    setIsLoading(true);
     hitApi()
       .then(function (data) {
        setArticle(data.kumpulanArtikel)
@@ -29,6 +37,9 @@ function App() {
           transition: Bounce,
           });
       })
+      .finally(function () {
+        setIsLoading(false);
+      })
   }, []);
 
   return (
@@ -39,7 +50,7 @@ function App() {
         hover
         responsive
         size=""
-        striped
+        striped={!isLoading}
       >
         <thead>
           <tr>
@@ -54,7 +65,18 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {article.map(function(datum) {
+          {isLoading ? 
+          <tr>
+            <td className="text-center" colSpan={3}>
+              <Spinner
+                className="m-5"
+                color="primary"
+              >
+                Loading...
+              </Spinner>
+            </td>
+          </tr> : 
+          article.map(function(datum) {
             const nama = "!!!!"
             return (
               <tr key={datum.id}>
@@ -65,11 +87,21 @@ function App() {
                   {datum.title} {nama}
                 </td>
                 <td className="text-center">
-                  <Button
-                    outline
-                  >
-                    Detail
-                  </Button>
+                  {/* <Link to={`/detail/${datum.id}`}>
+                    <Button
+                      outline
+                    >
+                      Detail
+                    </Button>
+                  </Link> */}
+                    <Button
+                      outline
+                      onClick={function () {
+                        navigateTo(`/detail/${datum.id}`)
+                      }}
+                    >
+                      Detail
+                    </Button>
                 </td>
               </tr>
             )

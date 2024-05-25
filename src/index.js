@@ -9,12 +9,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // pages
 import App from './pages/App';
+import BlogDetail from './pages/BlogDetail';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <Routes>
       <Route path='/' element={<App />} /> 
+      <Route path='/detail/:id' element={<BlogDetail />} />
       <Route path='*' element={<div>Not Found !!</div>} />
     </Routes>
   </BrowserRouter>
